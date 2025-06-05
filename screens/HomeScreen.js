@@ -9,12 +9,13 @@ export default function HomeScreen() {
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Abajur Inteligente</Text>
         
-        <PowerButton />
-        
-        <BrightnessSlider />
-        
-        <ColorModePicker />
-        
+        <PowerButton isConnected={isConnected} />
+                
+        <ColorModePicker 
+          onSelectMode={handleColorChange}
+          disabled={!isConnected}
+        />
+                
         <ScheduleList />
       </ScrollView>
   );

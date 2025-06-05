@@ -1,18 +1,31 @@
 import { useState } from 'react';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
-import { colorModes } from '../config/modes'
+import { useTheme } from '../hooks/useTheme';
 
-export default function ColorModePicker() {
+// Modos pré-configurados (mantidos conforme seu código original)
+const colorModes = [
+  { id: '1', name: 'Branco Quente' },
+  { id: '2', name: 'Branco Frio' },
+  { id: '3', name: 'Ambiente' },
+  { id: '4', name: 'Concentração' },
+  { id: '5', name: 'Relaxamento' },
+];
+
+export default function ColorModePicker({ onSelectMode, disabled }) {
+  const { theme } = useTheme();
   const [selectedMode, setSelectedMode] = useState(null);
 
-  const selectMode = (mode) => {
-    setSelectedMode(mode);
-    // Aqui vai a lógica para enviar o comando via Bluetooth
+  const selectMode = (modeId) => {
+    if (disabled) return;
+    
+    setSelectedMode(modeId);
+    // Envia o comando no formato "M<modo>" (ex: "M1") - ajuste conforme seu Arduino
+    onSelectMode(`M${modeId}`); 
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Modos de Cor</Text>
+      <Text style={[styles.title, { color: theme.text }]}>Modos de Cor</Text>
       <FlatList
         data={colorModes}
         horizontal
@@ -22,9 +35,11 @@ export default function ColorModePicker() {
           <TouchableOpacity
             style={[
               styles.modeButton,
-              selectedMode?.id === item.id && styles.selectedMode
+              { backgroundColor: disabled ? theme.surface : theme.primary },
+              selectedMode === item.id && styles.selectedMode
             ]}
-            onPress={() => selectMode(item)}
+            onPress={() => selectMode(item.id)}
+            disabled={disabled}
           >
             <Text style={styles.modeText}>{item.name}</Text>
           </TouchableOpacity>
@@ -35,13 +50,14 @@ export default function ColorModePicker() {
   );
 }
 
+// Mantendo SEUS estilos originais (apenas ajustando cores dinâmicas)
 const styles = StyleSheet.create({
   container: {
     width: '100%',
     marginBottom: 30,
   },
   title: {
-    color: 'white',
+    color: theme => theme.text, // Cor dinâmica
     fontSize: 16,
     marginBottom: 15,
     paddingHorizontal: 20,
@@ -52,13 +68,13 @@ const styles = StyleSheet.create({
   modeButton: {
     padding: 15,
     marginHorizontal: 5,
-    backgroundColor: '#333',
     borderRadius: 10,
   },
   selectedMode: {
-    backgroundColor: '#6200EE',
+    opacity: 0.8,
   },
   modeText: {
     color: 'white',
+    textAlign: 'center',
   },
 });
